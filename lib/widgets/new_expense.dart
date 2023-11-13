@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class NewExpense extends StatefulWidget {
   const NewExpense({super.key, required this.onAddExpense});
 
-  final Function onAddExpense;
+  final void Function(Expense expense) onAddExpense;
 
   @override
   State<StatefulWidget> createState() {
