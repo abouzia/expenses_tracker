@@ -1,3 +1,4 @@
+import 'package:expenses_tracker/widgets/charts/chart.dart';
 import 'package:expenses_tracker/widgets/expenses_list/expenses_list.dart';
 import 'package:expenses_tracker/models/expense.dart';
 import 'package:expenses_tracker/widgets/new_expense.dart';
@@ -65,28 +66,68 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Flutter Expense Tracker'),
-          actions: [
-            IconButton(
-              onPressed: _openAddExpenseOverlay,
-              icon: const Icon(Icons.add),
-            )
-          ],
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              const Text('The chart'),
-              Expanded(
-                child: ExpensesList(
-                  expenses: _expensesList,
-                  onDeleteExpense: _deleteExpense,
-                ),
+      appBar: AppBar(
+        title: const Text('Flutter Expense Tracker'),
+        actions: [
+          IconButton(
+            onPressed: _openAddExpenseOverlay,
+            icon: const Icon(Icons.add),
+          )
+        ],
+      ),
+      body: Center(
+        child: width < 600
+            ? Column(
+                children: [
+                  Chart(expenses: _expensesList),
+                  Expanded(
+                    child: ExpensesList(
+                      expenses: _expensesList,
+                      onDeleteExpense: _deleteExpense,
+                    ),
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(child: Chart(expenses: _expensesList)),
+                  Expanded(
+                    child: ExpensesList(
+                      expenses: _expensesList,
+                      onDeleteExpense: _deleteExpense,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ));
+      ),
+    );
+  }
+}
+
+class ExpenseBucket {
+  const ExpenseBucket({
+    required this.category,
+    required this.expenses,
+  });
+
+  ExpenseBucket.forCategory(List<Expense> allExpenses, this.category)
+      : expenses = allExpenses
+            .where((expense) => expense.category == category)
+            .toList();
+
+  final Category category;
+  final List<Expense> expenses;
+
+  double get totalExpenses {
+    double sum = 0;
+
+    for (final expense in expenses) {
+      sum += expense.amount;
+    }
+
+    return sum;
   }
 }
